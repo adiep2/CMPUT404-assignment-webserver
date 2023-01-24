@@ -4,7 +4,6 @@ import mimetypes
 from os import path
 
 # Copyright 2013 Abram Hindle, Eddie Antonio Santos
-# Edited by Aaron Diep
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,7 +38,7 @@ class MyWebServer(socketserver.BaseRequestHandler):
             requestPath = requestArray[1].decode("utf-8")
             redirect = False
             if requestPath[len(requestPath) - 1] == '/':
-                requestArray[1] = requestArray[1] + "index.html".encode()
+                requestPath = requestPath + "index.html"
             elif "." not in requestPath:
                 self.request.sendall(bytearray("HTTP/1.0 301\n", "utf-8"))
                 location = "Location: " + requestPath + "/\r\n"
@@ -51,9 +50,6 @@ class MyWebServer(socketserver.BaseRequestHandler):
                 if (path.exists(filePath) and fileType[0] is not None):
                     report_file = open(filePath)
                     file = report_file.read()
-                    # Formatting of the request was found and modified to fit our situation from the following links
-                    # https://stackoverflow.com/questions/47726865/html-page-not-displaying-using-python-socket-programming
-                    # https://stackoverflow.com/questions/21153262/sending-html-through-python-socket-server
                     self.request.sendall(bytearray("HTTP/1.0 200 OK\n", "utf-8"))
                     contentType = "Content-Type: " + fileType[0] + "\r\n"
                     self.request.sendall(bytearray(contentType, "utf-8"))
