@@ -1,7 +1,7 @@
 #  coding: utf-8 
 import socketserver
 import mimetypes
-from os import path
+from os import path, getcwd
 
 # Copyright 2013 Abram Hindle, Eddie Antonio Santos
 # 
@@ -39,7 +39,7 @@ class MyWebServer(socketserver.BaseRequestHandler):
             redirect = False
             if requestPath[len(requestPath) - 1] == '/':
                 requestPath = requestPath + "index.html"
-            elif "." not in requestPath:
+            elif "." not in requestPath and path.isdir("www" + requestPath):
                 self.request.sendall(bytearray("HTTP/1.0 301\n", "utf-8"))
                 location = "Location: " + requestPath + "/\r\n"
                 self.request.sendall(bytearray(location, "utf-8"))
@@ -47,12 +47,15 @@ class MyWebServer(socketserver.BaseRequestHandler):
             if not redirect:
                 fileType = mimetypes.guess_type(requestPath)
                 filePath = "www" + requestPath
-                if (path.exists(filePath) and fileType[0] is not None):
+                scriptPath = getcwd() + "/www"
+                absPath = path.abspath(filePath)
+                if (path.exists(filePath) and scriptPath in absPath):
                     report_file = open(filePath)
                     file = report_file.read()
-                    self.request.sendall(bytearray("HTTP/1.0 200 OK\n", "utf-8"))
-                    contentType = "Content-Type: " + fileType[0] + "\r\n"
-                    self.request.sendall(bytearray(contentType, "utf-8"))
+                    self.request.sendall(bytearray("HTTP/1.0 200 OK\r\n", "utf-8"))
+                    if fileType[0] is not None:
+                        contentType = "Content-Type: " + fileType[0] + "\r\n"
+                        self.request.sendall(bytearray(contentType, "utf-8"))
                     self.request.sendall(bytearray("\r\n", "utf-8"))
                     self.request.sendall(bytearray(file, "utf-8"))
                 else:
