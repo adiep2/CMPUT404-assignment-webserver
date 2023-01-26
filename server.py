@@ -52,6 +52,9 @@ class MyWebServer(socketserver.BaseRequestHandler):
                 if (path.exists(filePath) and scriptPath in absPath):
                     report_file = open(filePath)
                     file = report_file.read()
+                    # Formatting of the request was found and modified to fit our situation from the following links
+                    # Anonymous 23234720-12473, HTML Page not displaying using Python Socket Programming, 2017, https://stackoverflow.com/questions/47726865/html-page-not-displaying-using-python-socket-programming
+                    # Goose, Sending HTML through Python Socket Server, 2014, https://stackoverflow.com/questions/21153262/sending-html-through-python-socket-server
                     self.request.sendall(bytearray("HTTP/1.0 200 OK\r\n", "utf-8"))
                     if fileType[0] is not None:
                         contentType = "Content-Type: " + fileType[0] + "\r\n"
